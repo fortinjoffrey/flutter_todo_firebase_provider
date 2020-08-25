@@ -38,6 +38,8 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final _formKey = GlobalKey<FormState>();
+
   String username = '';
   String email = '';
   String password = '';
@@ -62,13 +64,20 @@ class _SignUpState extends State<SignUp> {
                   children: [
                     _buildLogoSignUpTextRow(),
                     SizedBox(height: 16.0),
-                    _buildEmailInput(),
-                    SizedBox(height: 16.0),
-                    _buildUsernameInput(),
-                    SizedBox(height: 16.0),
-                    _buildPasswordInput(),
-                    SizedBox(height: 16.0),
-                    _buildSignUpButton(),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _buildEmailInput(),
+                          SizedBox(height: 16.0),
+                          _buildUsernameInput(),
+                          SizedBox(height: 16.0),
+                          _buildPasswordInput(),
+                          SizedBox(height: 16.0),
+                          _buildSignUpButton(),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 16.0),
                     errorText != ''
                         ? Text(
@@ -148,13 +157,12 @@ class _SignUpState extends State<SignUp> {
         onPressed: () {
           FocusScope.of(context).unfocus();
 
-          if (email.isNotEmpty && password.isNotEmpty) {
+          if (_formKey.currentState.validate()) {
             _createUser();
           } else {
-            setState(() {
-              successText = '';
-              errorText = 'Please fill out the fields';
-            });
+            // clean success and error message
+            successText = '';
+            errorText = '';
           }
         },
         child: Text(
@@ -175,6 +183,8 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       decoration: textInputDecoration.copyWith(hintText: "Password"),
       obscureText: true,
+      validator: (val) =>
+          val.length < 6 ? 'Enter a password 6+ chars long' : null,
       onChanged: (value) => setState(() => password = value),
     );
   }
@@ -183,6 +193,7 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       keyboardType: TextInputType.name,
       decoration: textInputDecoration.copyWith(hintText: "Username"),
+      validator: (val) => val.isEmpty ? 'Enter a username' : null,
       onChanged: (value) => setState(() => username = value),
     );
   }
@@ -191,6 +202,7 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
       decoration: textInputDecoration.copyWith(hintText: "Email"),
+      validator: (val) => val.isEmpty ? 'Enter an email' : null,
       onChanged: (value) => setState(() => email = value),
     );
   }
