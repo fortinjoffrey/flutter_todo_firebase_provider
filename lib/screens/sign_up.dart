@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_provider/services/firebase_auth_services.dart';
 
 const textInputDecoration = InputDecoration(
   contentPadding: EdgeInsets.symmetric(horizontal: 18.0, vertical: 18.0),
@@ -37,9 +38,11 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  String username = "";
-  String email = "";
-  String password = "";
+  String username = '';
+  String email = '';
+  String password = '';
+  String errorText = '';
+  String successText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +68,25 @@ class _SignUpState extends State<SignUp> {
                     SizedBox(height: 16.0),
                     _buildPasswordInput(),
                     SizedBox(height: 16.0),
-                    _buildSignUpButton()
+                    _buildSignUpButton(),
+                    SizedBox(height: 16.0),
+                    errorText != ''
+                        ? Text(
+                            errorText,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                              fontSize: 14.0,
+                            ),
+                          )
+                        : Text(
+                            successText,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                              fontSize: 14.0,
+                            ),
+                          ),
                   ],
                 ),
               ),
@@ -101,12 +122,41 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
+  void _createUser() {
+    FirebaseAuthServices().createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+        onSuccess: () {
+          setState(() {
+            successText = 'Account created successfully';
+            errorText = '';
+          });
+        },
+        onError: (err) {
+          setState(() {
+            successText = '';
+            errorText = err;
+          });
+        });
+  }
+
   ButtonTheme _buildSignUpButton() {
     return ButtonTheme(
       minWidth: double.infinity,
       height: 50,
       child: RaisedButton(
-        onPressed: () {},
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+
+          if (email.isNotEmpty && password.isNotEmpty) {
+            _createUser();
+          } else {
+            setState(() {
+              successText = '';
+              errorText = 'Please fill out the fields';
+            });
+          }
+        },
         child: Text(
           'Sign Up',
           style: TextStyle(
@@ -125,6 +175,7 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       decoration: textInputDecoration.copyWith(hintText: "Password"),
       obscureText: true,
+      onChanged: (value) => setState(() => password = value),
     );
   }
 
@@ -132,6 +183,7 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       keyboardType: TextInputType.name,
       decoration: textInputDecoration.copyWith(hintText: "Username"),
+      onChanged: (value) => setState(() => username = value),
     );
   }
 
@@ -139,6 +191,7 @@ class _SignUpState extends State<SignUp> {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
       decoration: textInputDecoration.copyWith(hintText: "Email"),
+      onChanged: (value) => setState(() => email = value),
     );
   }
 }
