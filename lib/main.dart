@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_provider/services/firebase_auth_services.dart';
 
 import 'screens/home.dart';
 import 'screens/sign_up.dart';
@@ -14,8 +17,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    bool _isUserSignedIn = false;
-
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
@@ -23,7 +24,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: _isUserSignedIn ? Home() : SignUp(),
+      home: StreamProvider<User>.value(
+        value: FirebaseAuthServices().user,
+        child: Wrapper(),
+      ),
     );
+  }
+}
+
+class Wrapper extends StatelessWidget {
+  const Wrapper({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    return user == null ? SignUp() : Home();
   }
 }
