@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_provider/services/firebase_auth_services.dart';
 import 'package:todo_provider/utils/linear_gradient_extension.dart';
 import 'package:todo_provider/widgets/auth/auth_header_row_logo_title.dart';
 import 'package:todo_provider/widgets/auth/auth_main_button.dart';
@@ -28,7 +29,6 @@ class _SignInState extends State<SignIn> {
         decoration: BoxDecoration(
           gradient: LinearGradientExtension.authBgGradient,
         ),
-        // decoration: ,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -117,6 +117,20 @@ class _SignInState extends State<SignIn> {
   }
 
   void _sinInUser() async {
-    // TODO: call a method to signInUser in Firebase Auth
+    await FirebaseAuthServices().signInWithEmailAndPassword(
+        email: email,
+        password: password,
+        onSuccess: () {
+          setState(() {
+            successText = 'Logged in successfully';
+            errorText = '';
+          });
+        },
+        onError: (err) {
+          setState(() {
+            successText = '';
+            errorText = err;
+          });
+        });
   }
 }
