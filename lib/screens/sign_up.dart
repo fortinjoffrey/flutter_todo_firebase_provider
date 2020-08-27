@@ -1,34 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:todo_provider/services/firebase_auth_services.dart';
-
-const textInputDecoration = InputDecoration(
-  contentPadding: EdgeInsets.symmetric(horizontal: 18.0, vertical: 18.0),
-  fillColor: Colors.white,
-  filled: true,
-  border: const OutlineInputBorder(
-    borderRadius: const BorderRadius.all(Radius.circular(36.0)),
-  ),
-  enabledBorder: const OutlineInputBorder(
-    borderRadius: BorderRadius.all(const Radius.circular(36.0)),
-    borderSide: BorderSide(color: Colors.white, width: 1.0),
-  ),
-  focusedBorder: const OutlineInputBorder(
-    borderRadius: BorderRadius.all(const Radius.circular(36.0)),
-    borderSide: BorderSide(color: Colors.blue, width: 1.0),
-  ),
-);
-
-const backgroundLinearGradient = LinearGradient(
-  begin: Alignment.topCenter,
-  end: Alignment.bottomCenter,
-  stops: [0.1, 0.4, 0.7, 0.9],
-  colors: [
-    Color(0xFF3594DD),
-    Color(0xFF4563DB),
-    Color(0xFF5036D5),
-    Color(0xFF5B16D0),
-  ],
-);
+import 'package:todo_provider/utils/linear_gradient_extension.dart';
+import 'package:todo_provider/widgets/auth/auth_header_row_logo_title.dart';
+import 'package:todo_provider/widgets/auth/auth_main_button.dart';
+import 'package:todo_provider/widgets/auth/auth_text_form_field.dart';
 
 class SignUp extends StatefulWidget {
   SignUp({Key key}) : super(key: key);
@@ -52,9 +27,8 @@ class _SignUpState extends State<SignUp> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
-          gradient: backgroundLinearGradient,
+          gradient: LinearGradientExtension.authBgGradient,
         ),
-        // decoration: ,
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -62,19 +36,26 @@ class _SignUpState extends State<SignUp> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildLogoSignUpTextRow(),
+                    AuthHeaderRowLogoTitle(title: 'Sign Up'),
                     SizedBox(height: 16.0),
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          _buildEmailInput(),
+                          _buildAuthTextFormField(AuthTextFormFieldType.Email),
                           SizedBox(height: 16.0),
-                          _buildUsernameInput(),
+                          _buildAuthTextFormField(
+                              AuthTextFormFieldType.Username),
                           SizedBox(height: 16.0),
-                          _buildPasswordInput(),
+                          _buildAuthTextFormField(
+                              AuthTextFormFieldType.Password),
                           SizedBox(height: 16.0),
-                          _buildSignUpButton(),
+                          AuthMainButton(
+                            title: 'Sign Up',
+                            onPressed: () {
+                              _handleSignUpPressed(context);
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -106,29 +87,36 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Row _buildLogoSignUpTextRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Flexible(
-          child: Image.asset(
-            'assets/logos/firebase_logo.png',
-            height: 150,
-          ),
-        ),
-        Flexible(
-          flex: 3,
-          child: Text(
-            "Sign Up",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 32.0,
-            ),
-          ),
-        )
-      ],
-    );
+  AuthTextFormField _buildAuthTextFormField(AuthTextFormFieldType type) {
+    return AuthTextFormField(
+        type: type,
+        onChanged: (value) {
+          switch (type) {
+            case AuthTextFormFieldType.Email:
+              email = value;
+              break;
+            case AuthTextFormFieldType.Username:
+              username = value;
+              break;
+            case AuthTextFormFieldType.Password:
+              password = value;
+              break;
+            default:
+              return '';
+          }
+        });
+  }
+
+  void _handleSignUpPressed(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    if (_formKey.currentState.validate()) {
+      _createUser();
+    } else {
+      // clean success and error message
+      successText = '';
+      errorText = '';
+    }
   }
 
   void _createUser() async {
@@ -147,63 +135,5 @@ class _SignUpState extends State<SignUp> {
             errorText = err;
           });
         });
-  }
-
-  ButtonTheme _buildSignUpButton() {
-    return ButtonTheme(
-      minWidth: double.infinity,
-      height: 50,
-      child: RaisedButton(
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-
-          if (_formKey.currentState.validate()) {
-            _createUser();
-          } else {
-            // clean success and error message
-            successText = '';
-            errorText = '';
-          }
-        },
-        child: Text(
-          'Sign Up',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 16.0,
-          ),
-        ),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(36.0)),
-      ),
-    );
-  }
-
-  TextFormField _buildPasswordInput() {
-    return TextFormField(
-      decoration: textInputDecoration.copyWith(hintText: "Password"),
-      obscureText: true,
-      validator: (val) =>
-          val.length < 6 ? 'Enter a password 6+ chars long' : null,
-      onChanged: (value) => setState(() => password = value),
-    );
-  }
-
-  TextFormField _buildUsernameInput() {
-    return TextFormField(
-      keyboardType: TextInputType.name,
-      decoration: textInputDecoration.copyWith(hintText: "Username"),
-      validator: (val) => val.isEmpty ? 'Enter a username' : null,
-      onChanged: (value) => setState(() => username = value),
-    );
-  }
-
-  TextFormField _buildEmailInput() {
-    return TextFormField(
-      keyboardType: TextInputType.emailAddress,
-      decoration: textInputDecoration.copyWith(hintText: "Email"),
-      validator: (val) => val.isEmpty ? 'Enter an email' : null,
-      onChanged: (value) => setState(() => email = value),
-    );
   }
 }
