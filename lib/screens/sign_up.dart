@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_provider/mixins/auth_delegate.dart';
 import 'package:todo_provider/services/firebase_auth_services.dart';
 import 'package:todo_provider/utils/linear_gradient_extension.dart';
 import 'package:todo_provider/widgets/auth/auth_header_row_logo_title.dart';
@@ -6,7 +7,8 @@ import 'package:todo_provider/widgets/auth/auth_main_button.dart';
 import 'package:todo_provider/widgets/auth/auth_text_form_field.dart';
 
 class SignUp extends StatefulWidget {
-  SignUp({Key key}) : super(key: key);
+  SignUp({Key key, this.delegate}) : super(key: key);
+  final AuthDelegate delegate;
 
   @override
   _SignUpState createState() => _SignUpState();
@@ -77,6 +79,23 @@ class _SignUpState extends State<SignUp> {
                               fontSize: 14.0,
                             ),
                           ),
+                    SizedBox(height: 16.0),
+                    FlatButton(
+                      onPressed: () {
+                        if (widget.delegate != null) {
+                          widget.delegate.onSwitchToSignInPressed();
+                        }
+                      },
+                      child: RichText(
+                        text: TextSpan(children: [
+                          TextSpan(text: 'Already have an account? '),
+                          TextSpan(
+                            text: 'Sign in',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ]),
+                      ),
+                    ),
                   ],
                 ),
               ),
