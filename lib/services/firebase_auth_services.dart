@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_provider/services/firebase_firestore_services.dart';
 
 class FirebaseAuthServices {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -50,9 +51,10 @@ class FirebaseAuthServices {
     return null;
   }
 
-  Future<User> createUserWithEmailAndPassword({
+  Future<User> createUserWithEmailPasswordUsername({
     @required String email,
     @required String password,
+    @required String username,
     ValueChanged<String> onError,
     VoidCallback onSuccess,
   }) async {
@@ -62,8 +64,11 @@ class FirebaseAuthServices {
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      User user = userCredential.user;
       onSuccess();
+      User user = userCredential.user;
+
+      FirebaseFirestoreServices().registerUsername(username);
+
       return user;
     } on FirebaseAuthException catch (e) {
       String err;

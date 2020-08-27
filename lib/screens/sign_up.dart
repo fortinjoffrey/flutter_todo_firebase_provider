@@ -139,9 +139,10 @@ class _SignUpState extends State<SignUp> {
   }
 
   void _createUser() async {
-    await FirebaseAuthServices().createUserWithEmailAndPassword(
+    await FirebaseAuthServices().createUserWithEmailPasswordUsername(
         email: email,
         password: password,
+        username: username,
         onSuccess: () {
           setState(() {
             successText = 'Account created successfully';
