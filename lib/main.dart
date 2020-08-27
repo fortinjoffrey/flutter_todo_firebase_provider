@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_provider/services/firebase_auth_services.dart';
 
 import 'screens/home.dart';
-import 'screens/sign_up.dart';
+import 'screens/sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +38,7 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    return user == null ? SignUp() : Home();
+    // return user == null ? SignUp() : Home();
+    return user == null ? SignIn() : Home();
   }
 }
