@@ -23,6 +23,8 @@ class _SignInState extends State<SignIn> {
   String errorText = '';
   String successText = '';
 
+  bool testMode = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +54,10 @@ class _SignInState extends State<SignIn> {
                           AuthMainButton(
                             title: 'Sign In',
                             onPressed: () {
+                              if (testMode) {
+                                email = 'dummy@gmail.com';
+                                password = '123123';
+                              }
                               _handleSignInPressed(context);
                             },
                           ),
@@ -125,6 +131,13 @@ class _SignInState extends State<SignIn> {
 
   void _handleSignInPressed(BuildContext context) {
     FocusScope.of(context).unfocus();
+
+    // ! for test purpose only
+    if (testMode) {
+      _sinInUser();
+      return;
+    }
+    // !
 
     if (_formKey.currentState.validate()) {
       _sinInUser();
