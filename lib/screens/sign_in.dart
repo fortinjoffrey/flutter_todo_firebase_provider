@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_provider/mixins/auth_delegate.dart';
-import 'package:todo_provider/services/firebase_auth_services.dart';
+import 'package:todo_provider/services/firebase/firebase_auth_services.dart';
 import 'package:todo_provider/utils/linear_gradient_extension.dart';
 import 'package:todo_provider/widgets/auth/auth_header_row_logo_title.dart';
 import 'package:todo_provider/widgets/auth/auth_main_button.dart';
@@ -23,7 +23,7 @@ class _SignInState extends State<SignIn> {
   String errorText = '';
   String successText = '';
 
-  bool testMode = false;
+  bool testMode = true;
 
   @override
   Widget build(BuildContext context) {
